@@ -15,24 +15,27 @@ const HTTP_PORT = config.httpPort; // Use configured port
 
 // Create HTTP/2 server with secure connection
 const server = http2.createSecureServer(sslOptions, (req, res) => {
-    let filePath;
 
-    // Determine filePath based on req.url
-    if (req.url === config.rootRoute) {
-        filePath = path.join(config.rootDir, '/', config.rootFile);
-    } else if (req.url === config.newRoute) {
-        filePath = path.join(config.newDir, '/', config.newFile);
-    }
+    // Logic to find the matching route and create filePath
+    const filePath = (() => {
+        for (const key in config) {
+            if (key.endsWith("Route") && config[key] === req.url) {
+                const keyBase = key.replace("Route", ""); // Extract the key base (e.g., root, new)
+                const dirKey = keyBase + "Dir";  // Example: rootDir, newDir
+                const fileKey = keyBase + "File"; // Example: rootFile, newFile
 
-    // If filePath is undefined, it means the route doesn't match any known routes
-    if (!filePath) {
-        res.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        });
-        res.end(JSON.stringify({ message: 'Unknown route' }));
-        return;
-    }    
+                // Join the directory and file path intelligently using path.join (OS-agnostic)
+                return path.join(config[dirKey], config[fileKey]);
+
+                // If you wanted to force '/' separators, you could do:
+                // return config[dirKey] + '/' + config[fileKey];
+            }
+        }
+
+        // If no match is found, return a default or handle the error
+        return null; 
+    })();
+
     fs.readFile(filePath, (err, data) => {
         if (err) {
             // File not found, serve a positive JSON response
@@ -52,26 +55,26 @@ const server = http2.createSecureServer(sslOptions, (req, res) => {
                 });
                 res.end(JSON.stringify({ message: 'Preflight response' }));
             } else if (req.url === config.rootRoute) {
-                // Serve the main index.html for the root route
+                // Serve the root route file
                 res.writeHead(200, {
                     'Content-Type': 'text/html',
                     'Access-Control-Allow-Origin': '*'
                 });
                 res.end(data);
             } else if (req.url === config.newRoute) {
-                // Serve the main index.html for the root route
+                // Serve the new route file
                 res.writeHead(200, {
                     'Content-Type': 'text/html',
                     'Access-Control-Allow-Origin': '*'
                 });
                 res.end(data);
             } else {
-                // Serve a fallback response for unknown routes
+                // Serve the file for the matched route
                 res.writeHead(200, {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'text/html',
                     'Access-Control-Allow-Origin': '*'
                 });
-                res.end(JSON.stringify({ message: 'Fallback response for unknown route' }));
+                res.end(data);
             }
         }
     });
@@ -81,4 +84,3 @@ const server = http2.createSecureServer(sslOptions, (req, res) => {
 server.listen(HTTP_PORT, () => {
     console.log(`HTTP/2 server running on https://localhost:${HTTP_PORT}`);
 });
-

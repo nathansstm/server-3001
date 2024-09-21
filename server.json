@@ -6,7 +6,11 @@
     "httpPort": 3001,
     "rootRoute": "/",
     "rootDir": "/app/path/www",
-    "rootFile": "index.html"
+    "rootFile": "index.html",
+    "newRoute": "/app/path/new",
+    "newDir": "/app/path/app",
+    "newFile": "index.html"
 }
+
 
 

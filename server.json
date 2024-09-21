@@ -1,0 +1,12 @@
+{
+    "ssl": {
+        "key": "/app/path/ssl/privkey.pem",
+        "cert": "/app/path/ssl/fullchain.pem"
+    },
+    "httpPort": 3001,
+    "rootRoute": "/",
+    "rootDir": "/app/path/www",
+    "rootFile": "index.html"
+}
+
+

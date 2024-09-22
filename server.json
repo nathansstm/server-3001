@@ -1,7 +1,7 @@
 {
     "ssl": {
-        "key": "/app/path/ssl/privkey.pem",
-        "cert": "/app/path/ssl/fullchain.pem"
+        "key": "ssl/privkey.pem",
+        "cert": "ssl/fullchain.pem"
     },
     "httpPort": 3001,
     "rootRoute": "/",
@@ -11,6 +11,7 @@
     "newDir": "/app/path/app",
     "newFile": "index.html"
 }
+
 
 
 
